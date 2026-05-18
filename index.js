@@ -3,7 +3,7 @@ dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
 const cors = require('cors')
 const dotenv = require('dotenv')
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 dotenv.config()
 
 const uri = process.env.MONGODB_URL
@@ -52,8 +52,12 @@ const run = async() => {
             res.json(result);
         })
 
-
-
+        // api-- geting id based data from database---
+        app.get('/pets/:petId', async (req, res) => {
+            const { petId } = req.params;
+            const result = await petsCollection.findOne({_id: new ObjectId(petId)})
+            res.json(result);
+        })
 
 
 
