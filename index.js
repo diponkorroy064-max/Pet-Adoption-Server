@@ -43,6 +43,15 @@ const run = async() => {
             res.json(result);
         })
 
+
+        // get email based all data from mongodb---
+        app.get('/pets/:email', async (req, res) => {
+            const {email} = req.params;
+            const result = await petsCollection.find({email: email}).toArray();
+            res.json(result);
+        })
+
+
         // insert pets Data---
         app.post('/pets', async (req, res) => {
             const petsData = req.body;
