@@ -44,6 +44,14 @@ const run = async() => {
         })
 
 
+        // // api-- geting id based data from database---
+        // app.get('/pets/:petId', async (req, res) => {
+        //     const { petId } = req.params;
+        //     const result = await petsCollection.findOne({ _id: new ObjectId(petId) })
+        //     res.json(result);
+        // })
+
+
         // get email based all data from mongodb---
         app.get('/pets/:email', async (req, res) => {
             const {email} = req.params;
@@ -61,12 +69,23 @@ const run = async() => {
             res.json(result);
         })
 
-        // api-- geting id based data from database---
-        app.get('/pets/:petId', async (req, res) => {
+    
+        // update api---
+        app.patch('/pets/:petId', async (req, res) => {
             const { petId } = req.params;
-            const result = await petsCollection.findOne({_id: new ObjectId(petId)})
+            const updatedPetData = req.body;
+            console.log(updatedPetData);
+
+            const result = await petsCollection.updateOne(
+                { _id: new ObjectId(petId) },
+                { $set: updatedPetData });
+
             res.json(result);
         })
+
+
+
+
 
 
 
