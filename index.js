@@ -44,12 +44,12 @@ const run = async() => {
         })
 
 
-        // // api-- geting id based data from database---
-        // app.get('/pets/:petId', async (req, res) => {
-        //     const { petId } = req.params;
-        //     const result = await petsCollection.findOne({ _id: new ObjectId(petId) })
-        //     res.json(result);
-        // })
+        // api-- geting id based data from database---
+        app.get('/pets/:petId/byId', async (req, res) => {
+            const { petId } = req.params;
+            const result = await petsCollection.findOne({ _id: new ObjectId(petId) })
+            res.json(result);
+        })
 
 
         // get email based all data from mongodb---
@@ -71,7 +71,7 @@ const run = async() => {
 
     
         // update api---
-        app.patch('/pets/:petId', async (req, res) => {
+        app.patch('/pets/:petId/update', async (req, res) => {
             const { petId } = req.params;
             const updatedPetData = req.body;
             console.log(updatedPetData);
@@ -80,6 +80,15 @@ const run = async() => {
                 { _id: new ObjectId(petId) },
                 { $set: updatedPetData });
 
+            res.json(result);
+        })
+
+
+
+        // delete info. api---
+        app.delete('/pets/:id/delete', async (req, res) => {
+            const { id } = req.params;
+            const result = await petsCollection.deleteOne({ _id: new ObjectId(id) });
             res.json(result);
         })
 
