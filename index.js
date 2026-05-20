@@ -119,9 +119,16 @@ const run = async () => {
         })
 
 
+        // get email based adoptRequestdata from mongodb---
+        app.get('/adoption/:email/userEmail', async (req, res) => {
+            const { email } = req.params;
+            const result = await adoptRequestCollection.find({ email: email }).toArray();
+            res.json(result);
+        })
 
 
-        
+
+
 
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
