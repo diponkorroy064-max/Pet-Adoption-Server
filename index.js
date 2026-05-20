@@ -37,6 +37,8 @@ const run = async() => {
         const db = client.db("pet-adoption-database");
         const petsCollection = db.collection('pets');
 
+        const adoptRequestCollection = db.collection("adoption");
+
         // get all data from mongodb---
         app.get('/pets', async (req, res) => {
             const result = await petsCollection.find().toArray();
@@ -66,6 +68,16 @@ const run = async() => {
             console.log(petsData);
 
             const result = await petsCollection.insertOne(petsData);
+            res.json(result);
+        })
+
+
+        // insert adoption request Data---
+        app.post('/adoption', async (req, res) => {
+            const adoptionData = req.body;
+            console.log(adoptionData);
+
+            const result = await adoptRequestCollection.insertOne(adoptionData);
             res.json(result);
         })
 
