@@ -36,8 +36,8 @@ const run = async() => {
         // database connection---
         const db = client.db("pet-adoption-database");
         const petsCollection = db.collection('pets');
-
         const adoptRequestCollection = db.collection("adoption");
+
 
         // get all data from mongodb---
         app.get('/pets', async (req, res) => {
@@ -71,16 +71,6 @@ const run = async() => {
             res.json(result);
         })
 
-
-        // insert adoption request Data---
-        app.post('/adoption', async (req, res) => {
-            const adoptionData = req.body;
-            console.log(adoptionData);
-
-            const result = await adoptRequestCollection.insertOne(adoptionData);
-            res.json(result);
-        })
-
     
         // update api---
         app.patch('/pets/:petId/update', async (req, res) => {
@@ -96,7 +86,6 @@ const run = async() => {
         })
 
 
-
         // delete info. api---
         app.delete('/pets/:id/delete', async (req, res) => {
             const { id } = req.params;
@@ -105,9 +94,21 @@ const run = async() => {
         })
 
 
+        // insert adoption request Data---
+        app.post('/adoption', async (req, res) => {
+            const adoptionData = req.body;
+            console.log(adoptionData);
+
+            const result = await adoptRequestCollection.insertOne(adoptionData);
+            res.json(result);
+        })
 
 
-
+        // get all adoptRequestdata from mongodb---
+        app.get('/adoption', async(req, res) => {
+            const result = await adoptRequestCollection.find().toArray();
+            res.json(result);
+        })
 
 
         await client.db("admin").command({ ping: 1 });
