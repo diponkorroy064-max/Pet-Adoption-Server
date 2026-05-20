@@ -29,10 +29,10 @@ const client = new MongoClient(uri, {
 
 
 
-const run = async() => {
+const run = async () => {
     try {
         await client.connect();
-      
+
         // database connection---
         const db = client.db("pet-adoption-database");
         const petsCollection = db.collection('pets');
@@ -56,8 +56,8 @@ const run = async() => {
 
         // get email based all data from mongodb---
         app.get('/pets/:email', async (req, res) => {
-            const {email} = req.params;
-            const result = await petsCollection.find({email: email}).toArray();
+            const { email } = req.params;
+            const result = await petsCollection.find({ email: email }).toArray();
             res.json(result);
         })
 
@@ -71,7 +71,7 @@ const run = async() => {
             res.json(result);
         })
 
-    
+
         // update api---
         app.patch('/pets/:petId/update', async (req, res) => {
             const { petId } = req.params;
@@ -105,11 +105,23 @@ const run = async() => {
 
 
         // get all adoptRequestdata from mongodb---
-        app.get('/adoption', async(req, res) => {
+        app.get('/adoption', async (req, res) => {
             const result = await adoptRequestCollection.find().toArray();
             res.json(result);
         })
 
+
+        // get petName based adoptRequestdata from mongodb---
+        app.get('/adoption/:petName', async (req, res) => {
+            const { petName } = req.params;
+            const result = await adoptRequestCollection.find({ name: petName }).toArray();
+            res.json(result);
+        })
+
+
+
+
+        
 
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
