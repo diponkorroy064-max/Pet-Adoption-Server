@@ -127,6 +127,30 @@ const run = async () => {
         })
 
 
+        // cancel adoption request---
+        app.delete('/adoption/:id/byPetId', async (req, res) => {
+            const { id } = req.params;
+            const result = await adoptRequestCollection.deleteOne({ petId: id });
+            res.json(result);
+        })
+
+
+        // update api---
+        app.patch('/adoption/:petId/update', async (req, res) => {
+            const { petId } = req.params;
+            const updatedReqData = req.body;
+            console.log(updatedReqData);
+
+            const result = await adoptRequestCollection.updateOne(
+                { petId: petId },
+                { $set: updatedReqData });
+
+            res.json(result);
+        })
+
+
+
+
 
 
 
