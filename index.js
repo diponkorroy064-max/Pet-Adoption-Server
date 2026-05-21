@@ -8,7 +8,8 @@ dotenv.config()
 
 const uri = process.env.MONGODB_URL
 
-const express = require('express')
+const express = require('express');
+const { createRemoteJWKSet, jwtVerify } = require("jose-cjs");
 
 const app = express()
 const port = process.env.PORT
@@ -27,6 +28,34 @@ const client = new MongoClient(uri, {
     }
 });
 
+
+const JWkS = createRemoteJWKSet(
+    new URL("http://localhost:3000/api/auth/jwks")
+);
+
+const verifyToken = async (req, res, next) => {
+    const authHeader = req?.headers.authorization;
+    // console.log(authHeader);
+
+    if (!authHeader) {
+        return res.status(401).json({ message: "Unauthorized.." })
+    }
+
+    const token = authHeader.split(" ")[1];
+    if (!token) {
+        return res.status(401).json({ message: "Unauthorized" })
+    }
+    console.log(token);
+
+    try {
+        const { payload } = await jwtVerify(token, JWkS);
+        console.log("payload",payload);
+        next();
+    }
+    catch (error) {
+        return res.status(403).json({ message: "Forbidden" })
+    }
+};
 
 
 const run = async () => {
@@ -47,7 +76,7 @@ const run = async () => {
 
 
         // api-- geting id based data from database---
-        app.get('/pets/:petId/byId', async (req, res) => {
+        app.get('/pets/:petId/byId', verifyToken, async (req, res) => {
             const { petId } = req.params;
             const result = await petsCollection.findOne({ _id: new ObjectId(petId) })
             res.json(result);
@@ -55,7 +84,7 @@ const run = async () => {
 
 
         // get email based all data from mongodb---
-        app.get('/pets/:email', async (req, res) => {
+        app.get('/pets/:email', verifyToken, async (req, res) => {
             const { email } = req.params;
             const result = await petsCollection.find({ email: email }).toArray();
             res.json(result);
@@ -73,7 +102,7 @@ const run = async () => {
 
 
         // update api---
-        app.patch('/pets/:petId/update', async (req, res) => {
+        app.patch('/pets/:petId/update', verifyToken, async (req, res) => {
             const { petId } = req.params;
             const updatedPetData = req.body;
             console.log(updatedPetData);
@@ -87,7 +116,7 @@ const run = async () => {
 
 
         // delete info. api---
-        app.delete('/pets/:id/delete', async (req, res) => {
+        app.delete('/pets/:id/delete', verifyToken, async (req, res) => {
             const { id } = req.params;
             const result = await petsCollection.deleteOne({ _id: new ObjectId(id) });
             res.json(result);
@@ -95,7 +124,7 @@ const run = async () => {
 
 
         // insert adoption request Data---
-        app.post('/adoption', async (req, res) => {
+        app.post('/adoption', verifyToken, async (req, res) => {
             const adoptionData = req.body;
             console.log(adoptionData);
 
@@ -112,15 +141,15 @@ const run = async () => {
 
 
         // get petName based adoptRequestdata from mongodb---
-        app.get('/adoption/:petName', async (req, res) => {
-            const { petName } = req.params;
-            const result = await adoptRequestCollection.find({ name: petName }).toArray();
+        app.get('/adoption/:ID/newId', async (req, res) => {
+            const { ID } = req.params;
+            const result = await adoptRequestCollection.find({ petId: ID }).toArray();
             res.json(result);
         })
 
 
-        // get email based adoptRequestdata from mongodb---
-        app.get('/adoption/:email/userEmail', async (req, res) => {
+        // get email based adoptRequestdata ---
+        app.get('/adoption/:email/userEmail',verifyToken, async (req, res) => {
             const { email } = req.params;
             const result = await adoptRequestCollection.find({ email: email }).toArray();
             res.json(result);
@@ -128,7 +157,7 @@ const run = async () => {
 
 
         // cancel adoption request---
-        app.delete('/adoption/:id/byPetId', async (req, res) => {
+        app.delete('/adoption/:id/byPetId', verifyToken, async (req, res) => {
             const { id } = req.params;
             const result = await adoptRequestCollection.deleteOne({ petId: id });
             res.json(result);
@@ -136,17 +165,17 @@ const run = async () => {
 
 
         // update api---
-        app.patch('/adoption/:petId/update', async (req, res) => {
-            const { petId } = req.params;
-            const updatedReqData = req.body;
-            console.log(updatedReqData);
+        // app.patch('/adoption/:petId/update', async (req, res) => {
+        //     const { petId } = req.params;
+        //     const updatedReqData = req.body;
+        //     console.log(updatedReqData);
 
-            const result = await adoptRequestCollection.updateOne(
-                { petId: petId },
-                { $set: updatedReqData });
+        //     const result = await adoptRequestCollection.updateOne(
+        //         { petId: petId },
+        //         { $set: updatedReqData });
 
-            res.json(result);
-        })
+        //     res.json(result);
+        // })
 
 
 
