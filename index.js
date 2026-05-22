@@ -49,7 +49,7 @@ const verifyToken = async (req, res, next) => {
 
     try {
         const { payload } = await jwtVerify(token, JWkS);
-        console.log("payload",payload);
+        console.log("payload", payload);
         next();
     }
     catch (error) {
@@ -69,10 +69,46 @@ const run = async () => {
 
 
         // get all data from mongodb---
-        app.get('/pets', async (req, res) => {
+        app.get('/pets/all', async (req, res) => {
             const result = await petsCollection.find().toArray();
             res.json(result);
         })
+
+
+        // GET all pets with search + filter
+        app.get('/pets', async (req, res) => {
+            try {
+                const search = req.query.search || "";
+                const species = req.query.species || "";
+
+                let query = {};
+
+                // Search by pet name using regex
+                if (search) {
+                    query.petName = {
+                        $regex: search,
+                        $options: "i"
+                    };
+                }
+
+                // Filter by species using $in
+                if (species) {
+                    const speciesArray = species.split(',');
+
+                    query.species = {
+                        $in: speciesArray
+                    };
+                }
+
+                const result = await petsCollection.find(query).toArray();
+
+                res.send(result);
+
+            } catch (error) {
+                res.status(500).send({ message: error.message });
+            }
+        });
+
 
 
         // api-- geting id based data from database---
@@ -149,7 +185,7 @@ const run = async () => {
 
 
         // get email based adoptRequestdata ---
-        app.get('/adoption/:email/userEmail',verifyToken, async (req, res) => {
+        app.get('/adoption/:email/userEmail', verifyToken, async (req, res) => {
             const { email } = req.params;
             const result = await adoptRequestCollection.find({ email: email }).toArray();
             res.json(result);
@@ -164,20 +200,21 @@ const run = async () => {
         })
 
 
-        // update api---
-        // app.patch('/adoption/:petId/update', async (req, res) => {
-        //     const { petId } = req.params;
-        //     const updatedReqData = req.body;
-        //     console.log(updatedReqData);
+        // update api for reject and approve button action----
+        app.patch('/adoption/:petId/update', verifyToken, async (req, res) => {
+            const { petId } = req.params;
+            const updatedReqData = req.body;
+            console.log(updatedReqData);
 
-        //     const result = await adoptRequestCollection.updateOne(
-        //         { petId: petId },
-        //         { $set: updatedReqData });
+            const result = await adoptRequestCollection.updateOne(
+                { petId: petId },
+                { $set: updatedReqData });
 
-        //     res.json(result);
-        // })
+            res.json(result);
+        })
 
 
+        // searchinging api---
 
 
 
