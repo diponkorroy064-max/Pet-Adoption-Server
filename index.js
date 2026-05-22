@@ -30,7 +30,7 @@ const client = new MongoClient(uri, {
 
 
 const JWkS = createRemoteJWKSet(
-    new URL("http://localhost:3000/api/auth/jwks")
+    new URL(`${process.env.CLIENT_URL}/api/auth/jwks`)
 );
 
 const verifyToken = async (req, res, next) => {
@@ -60,7 +60,7 @@ const verifyToken = async (req, res, next) => {
 
 const run = async () => {
     try {
-        await client.connect();
+        // await client.connect();
 
         // database connection---
         const db = client.db("pet-adoption-database");
@@ -214,13 +214,8 @@ const run = async () => {
         })
 
 
-        // searchinging api---
 
-
-
-
-
-        await client.db("admin").command({ ping: 1 });
+        // await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     }
     finally {
