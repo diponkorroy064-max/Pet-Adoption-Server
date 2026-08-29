@@ -3,9 +3,11 @@ const router = express.Router();
 
 const petRoutes = require('../modules/pet/pet.routes');
 const adoptionRoutes = require('../modules/adoption/adoption.routes');
+const userRoutes = require('../modules/user/user.routes');
 
 router.use('/pets', petRoutes);
 router.use('/adoption', adoptionRoutes);
+router.use('/api/users', userRoutes)
 
 module.exports = router;
 
