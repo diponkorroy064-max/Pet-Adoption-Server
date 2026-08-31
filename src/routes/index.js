@@ -7,7 +7,7 @@ const userRoutes = require('../modules/user/user.routes');
 
 router.use('/pets', petRoutes);
 router.use('/adoption', adoptionRoutes);
-router.use('/api/users', userRoutes)
+router.use('/users', userRoutes)
 
 module.exports = router;
 

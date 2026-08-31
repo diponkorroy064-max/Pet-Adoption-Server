@@ -1,7 +1,13 @@
 const { ObjectId } = require('mongodb');
 const { getDB } = require('../../config/db');
 
-const getCollection = () => getDB().collection('pets');
+const getCollection = () => {
+    const db = getDB();
+    if (!db) {
+        throw new Error('Database connection is not initialized yet.');
+    }
+    return db.collection('pets');
+};
 
 const getAllPets = async () => {
     return await getCollection().find().toArray();
@@ -19,6 +25,9 @@ const getFilteredPets = async (search, species) => {
 };
 
 const getPetById = async (id) => {
+    if (!ObjectId.isValid(id)) {
+        throw new Error('Invalid ObjectId format');
+    }
     return await getCollection().findOne({ _id: new ObjectId(id) });
 };
 
@@ -31,6 +40,9 @@ const createPet = async (petData) => {
 };
 
 const updatePet = async (id, updateData) => {
+    if (!ObjectId.isValid(id)) {
+        throw new Error('Invalid ObjectId format');
+    }
     return await getCollection().updateOne(
         { _id: new ObjectId(id) },
         { $set: updateData }
@@ -38,6 +50,9 @@ const updatePet = async (id, updateData) => {
 };
 
 const deletePet = async (id) => {
+    if (!ObjectId.isValid(id)) {
+        throw new Error('Invalid ObjectId format');
+    }
     return await getCollection().deleteOne({ _id: new ObjectId(id) });
 };
 
